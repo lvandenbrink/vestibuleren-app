@@ -1,0 +1,5 @@
+package nl.lvdbrink.vestibuleren
+
+import io.flutter.embedding.android.FlutterActivity
+
+class MainActivity : FlutterActivity()
