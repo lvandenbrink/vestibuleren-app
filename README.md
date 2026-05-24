@@ -2,8 +2,6 @@
 
 A Flutter app that helps patients follow their vestibular rehabilitation programme at home. Users select exercises prescribed by their therapist, perform them with metronome guidance and configurable sets/reps/rest, and log feedback (rating, pain level, effect and notes) after each session. Progress is visualised in charts on the Statistics tab.
 
-Licensed under **CC BY-NC 4.0** — attribution required, no commercial use. See [LICENSE](LICENSE).
-
 A hosted web version is available at **<https://lvandenbrink.github.io/vestibuleren-app/>** — no installation required.
 
 ---
