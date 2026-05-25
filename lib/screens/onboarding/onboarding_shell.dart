@@ -77,7 +77,6 @@ class _OnboardingShellState extends ConsumerState<OnboardingShell> {
             Expanded(
               child: PageView(
                 controller: _controller,
-                physics: const NeverScrollableScrollPhysics(),
                 onPageChanged: (p) => setState(() => _currentPage = p),
                 children: [
                   _WelcomePage(onNext: _next),
