@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../data/exercise_catalog.dart';
 import '../../models/exercise.dart';
 import '../../providers/metronome_provider.dart';
+import '../../models/exercise_settings.dart';
 import '../../providers/settings_provider.dart';
 
 class ExerciseDetailScreen extends ConsumerStatefulWidget {
@@ -44,6 +45,14 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen>
     _reps = ex?.reps ?? 30;
     _sets = ex?.sets ?? 1;
     _rest = ex?.restSeconds ?? 30;
+    if (ex == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref.read(settingsProvider.notifier).updateExerciseSettings(
+          _exercise.id,
+          ExerciseSettings(bpm: _bpm, reps: _reps, sets: _sets, restSeconds: _rest),
+        );
+      });
+    }
   }
 
   @override
