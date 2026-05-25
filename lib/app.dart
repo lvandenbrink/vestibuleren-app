@@ -13,12 +13,6 @@ class App extends ConsumerWidget {
       title: 'Vestibuleren',
       theme: appTheme,
       routerConfig: router,
-      builder: (context, child) => Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 480),
-          child: child!,
-        ),
-      ),
     );
   }
 }

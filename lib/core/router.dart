@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/settings_provider.dart';
@@ -7,6 +8,13 @@ import '../screens/exercise/exercise_detail_screen.dart';
 import '../screens/feedback/feedback_screen.dart';
 import '../screens/settings/settings_screen.dart';
 import '../screens/about/about_screen.dart';
+
+Widget _narrow(Widget child) => Center(
+  child: ConstrainedBox(
+    constraints: const BoxConstraints(maxWidth: 480),
+    child: child,
+  ),
+);
 
 final routerProvider = Provider<GoRouter>((ref) {
   final initiallyOnboarded = ref.read(settingsProvider).onboardingComplete;
@@ -23,33 +31,33 @@ final routerProvider = Provider<GoRouter>((ref) {
     routes: [
       GoRoute(
         path: '/onboarding',
-        builder: (context, state) => const OnboardingShell(),
+        builder: (context, state) => _narrow(const OnboardingShell()),
       ),
       GoRoute(
         path: '/home',
-        builder: (context, state) => const HomeScreen(),
+        builder: (context, state) => _narrow(const HomeScreen()),
       ),
       GoRoute(
         path: '/exercise/:id',
         builder: (context, state) {
           final id = state.pathParameters['id']!;
-          return ExerciseDetailScreen(exerciseId: id);
+          return _narrow(ExerciseDetailScreen(exerciseId: id));
         },
       ),
       GoRoute(
         path: '/feedback/:id',
         builder: (context, state) {
           final id = state.pathParameters['id']!;
-          return FeedbackScreen(exerciseId: id);
+          return _narrow(FeedbackScreen(exerciseId: id));
         },
       ),
       GoRoute(
         path: '/settings',
-        builder: (context, state) => const SettingsScreen(),
+        builder: (context, state) => _narrow(const SettingsScreen()),
       ),
       GoRoute(
         path: '/about',
-        builder: (context, state) => const AboutScreen(),
+        builder: (context, state) => _narrow(const AboutScreen()),
       ),
     ],
   );
