@@ -1,7 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 import '../../providers/feedback_provider.dart';
 import '../../models/feedback_entry.dart';
 
@@ -30,42 +29,23 @@ class StatsTab extends ConsumerWidget {
       );
     }
 
-    // Group by date, sort chronologically → each date = one session
-    final byDate = <String, List<FeedbackEntry>>{};
-    for (final e in entries) {
-      final key = DateFormat('yyyy-MM-dd').format(e.completedAt);
-      byDate.putIfAbsent(key, () => []).add(e);
-    }
-    final sortedDates = byDate.keys.toList()..sort();
+    final sorted = entries.toList()
+      ..sort((a, b) => a.completedAt.compareTo(b.completedAt));
 
-    double? avg(List<num?> values) {
-      final v = values.whereType<num>().toList();
-      if (v.isEmpty) return null;
-      return v.fold(0.0, (s, e) => s + e) / v.length;
-    }
-
-    List<FlSpot> spots(double? Function(List<FeedbackEntry>) fn) {
-      final spots = <FlSpot>[];
-      for (var i = 0; i < sortedDates.length; i++) {
-        final val = fn(byDate[sortedDates[i]]!);
-        if (val != null) spots.add(FlSpot(i.toDouble() + 1, val));
+    List<FlSpot> spots(double? Function(FeedbackEntry) fn) {
+      final result = <FlSpot>[];
+      for (var i = 0; i < sorted.length; i++) {
+        final val = fn(sorted[i]);
+        if (val != null) result.add(FlSpot(i.toDouble() + 1, val));
       }
-      return spots;
+      return result;
     }
 
-    final bpmSpots = spots((es) => avg(es.map((e) => e.bpm).toList()));
-    final ratingSpots =
-        spots((es) => avg(es.map((e) => e.rating).toList()));
-    final painSpots =
-        spots((es) => avg(es.map((e) => e.painLevel).toList()));
-    final effectSpots = spots((es) {
-      final vals = es
-          .where((e) => e.madeItWorse != null)
-          .map((e) => e.madeItWorse! ? 0.0 : 1.0)
-          .toList();
-      if (vals.isEmpty) return null;
-      return vals.reduce((a, b) => a + b) / vals.length;
-    });
+    final bpmSpots = spots((e) => e.bpm?.toDouble());
+    final ratingSpots = spots((e) => e.rating?.toDouble());
+    final painSpots = spots((e) => e.painLevel?.toDouble());
+    final effectSpots =
+        spots((e) => e.madeItWorse == null ? null : (e.madeItWorse! ? 0.0 : 1.0));
 
     return ListView(
       padding: const EdgeInsets.all(16),
