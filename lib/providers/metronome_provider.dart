@@ -77,7 +77,7 @@ final metronomeProvider =
     NotifierProvider.autoDispose<MetronomeNotifier, MetronomeState>(
         () => MetronomeNotifier());
 
-class MetronomeNotifier extends AutoDisposeNotifier<MetronomeState> {
+class MetronomeNotifier extends Notifier<MetronomeState> {
   Timer? _countdownTimer;
   Timer? _metronomeTimer;
   int _bpm = 0;

@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../data/exercise_catalog.dart';
@@ -593,10 +593,10 @@ class _ExerciseContent extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             child: MarkdownBody(
               data: _body(snapshot.requireData),
-              sizedImageBuilder: (config) => Padding(
+              imageBuilder: (uri, _, __) => Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 child: Image.asset(
-                  'assets/exercises/${config.uri.path}',
+                  'assets/exercises/${uri.path}',
                   errorBuilder: (_, __, ___) => const SizedBox.shrink(),
                 ),
               ),

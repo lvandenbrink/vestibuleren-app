@@ -1,4 +1,4 @@
-import 'package:hive/hive.dart';
+import 'package:hive_ce/hive.dart';
 import 'exercise_settings.dart';
 
 part 'user_settings.g.dart';
