@@ -39,6 +39,7 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen>
     }
     _exercise = match;
     final ex = ref.read(settingsProvider).exerciseSettings[_exercise.id];
+    _settingsExpanded = ex == null;
     _bpm = ex?.bpm ?? _exercise.defaultBpm;
     _reps = ex?.reps ?? 30;
     _sets = ex?.sets ?? 1;
@@ -163,7 +164,7 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen>
             Card(
               clipBehavior: Clip.antiAlias,
               child: ExpansionTile(
-                initiallyExpanded: false,
+                initiallyExpanded: _settingsExpanded,
                 onExpansionChanged: (v) =>
                     setState(() => _settingsExpanded = v),
                 tilePadding:
