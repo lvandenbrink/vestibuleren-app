@@ -98,6 +98,12 @@ class MetronomeNotifier extends Notifier<MetronomeState> {
     try {
       for (int i = 0; i < 2; i++) {
         final p = AudioPlayer();
+        // Low-latency mode is backed by SoundPool (Android) / a comparable
+        // low-overhead path on other platforms, giving consistent timing for
+        // rapid, repeated short clips. The default mode (MediaPlayer/ExoPlayer)
+        // has variable per-play startup latency, which caused audible jitter
+        // between beats.
+        await p.setPlayerMode(PlayerMode.lowLatency);
         await p.setReleaseMode(ReleaseMode.stop);
         await p.setVolume(1.0);
         await p.setSource(AssetSource('audio/tick.wav'));
