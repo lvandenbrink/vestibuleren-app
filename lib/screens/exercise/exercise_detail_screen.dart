@@ -678,11 +678,11 @@ class _ExerciseContent extends StatelessWidget {
             child: MarkdownBody(
               data: _body(snapshot.requireData),
               imageBuilder:
-                  (uri, _, __) => Padding(
+                  (uri, _, _) => Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     child: Image.asset(
                       'assets/exercises/${uri.path}',
-                      errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                      errorBuilder: (_, _, _) => const SizedBox.shrink(),
                     ),
                   ),
             ),

@@ -192,7 +192,7 @@ class _ChartCard extends StatelessWidget {
                       color: color,
                       barWidth: 2.5,
                       dotData: FlDotData(
-                        getDotPainter: (spot, _, __, ___) =>
+                        getDotPainter: (spot, _, _, _) =>
                             FlDotCirclePainter(
                           radius: 4,
                           color: color,

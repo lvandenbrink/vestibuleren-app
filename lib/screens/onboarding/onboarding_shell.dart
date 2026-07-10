@@ -127,7 +127,7 @@ class _WelcomePage extends StatelessWidget {
               width: 100,
               height: 100,
               errorBuilder:
-                  (_, __, ___) => Icon(
+                  (_, _, _) => Icon(
                     Icons.self_improvement_rounded,
                     size: 100,
                     color: colors.primary,
