@@ -236,15 +236,21 @@ class _FeedbackScreenState extends ConsumerState<FeedbackScreen> {
             bpm: bpm,
           ),
         );
-    // feedbackProvider update already triggered sessionProvider to rebuild with
-    // the correct currentIndex — navigate without calling markCurrentComplete.
     await _navigateNext();
   }
 
   Future<void> _skipAndContinue() async {
-    final session = ref.read(sessionProvider.notifier);
-    session.markCurrentComplete();
-    session.advance();
+    final bpm =
+        ref.read(settingsProvider).exerciseSettings[widget.exerciseId]?.bpm;
+    await ref
+        .read(feedbackProvider.notifier)
+        .addEntry(
+          FeedbackEntry(
+            exerciseId: widget.exerciseId,
+            completedAt: DateTime.now(),
+            bpm: bpm,
+          ),
+        );
     await _navigateNext();
   }
 

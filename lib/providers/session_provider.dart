@@ -59,23 +59,4 @@ class SessionNotifier extends Notifier<SessionState> {
 
     return SessionState(items: exercises, currentIndex: currentIndex);
   }
-
-  void markCurrentComplete() {
-    if (state.current == null) return;
-    final updatedItems = [
-      for (int i = 0; i < state.items.length; i++)
-        if (i == state.currentIndex)
-          SessionItem(exercise: state.items[i].exercise, completed: true)
-        else
-          state.items[i],
-    ];
-    state = SessionState(items: updatedItems, currentIndex: state.currentIndex);
-  }
-
-  void advance() {
-    state = SessionState(
-      items: state.items,
-      currentIndex: state.currentIndex + 1,
-    );
-  }
 }
