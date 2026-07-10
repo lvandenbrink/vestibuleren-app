@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/adaptive_container.dart';
 import '../../providers/feedback_provider.dart';
 import '../../models/feedback_entry.dart';
 
@@ -15,16 +16,18 @@ class StatsTab extends ConsumerWidget {
 
     if (entries.isEmpty) {
       return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.bar_chart, size: 64, color: colors.outlineVariant),
-            const SizedBox(height: 16),
-            Text('Voltooi een sessie\nvoor statistieken.',
-                style: text.titleMedium
-                    ?.copyWith(color: colors.onSurfaceVariant),
-                textAlign: TextAlign.center),
-          ],
+        child: AdaptiveContainer(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.bar_chart, size: 64, color: colors.outlineVariant),
+              const SizedBox(height: 16),
+              Text('Voltooi een sessie\nvoor statistieken.',
+                  style: text.titleMedium
+                      ?.copyWith(color: colors.onSurfaceVariant),
+                  textAlign: TextAlign.center),
+            ],
+          ),
         ),
       );
     }
@@ -50,43 +53,49 @@ class StatsTab extends ConsumerWidget {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        if (bpmSpots.isNotEmpty)
-          _ChartCard(
-            title: 'BPM per sessie',
-            spots: bpmSpots,
-            color: colors.secondary,
-            minY: 0,
-            maxY: 260,
-            leftLabel: 'BPM',
+        AdaptiveContainer(
+          child: Column(
+            children: [
+              if (bpmSpots.isNotEmpty)
+                _ChartCard(
+                  title: 'BPM per sessie',
+                  spots: bpmSpots,
+                  color: colors.secondary,
+                  minY: 0,
+                  maxY: 260,
+                  leftLabel: 'BPM',
+                ),
+              if (ratingSpots.isNotEmpty)
+                _ChartCard(
+                  title: 'Beoordeling per sessie',
+                  spots: ratingSpots,
+                  color: colors.primary,
+                  minY: 0,
+                  maxY: 10,
+                  leftLabel: '/10',
+                ),
+              if (painSpots.isNotEmpty)
+                _ChartCard(
+                  title: 'Pijn per sessie',
+                  spots: painSpots,
+                  color: colors.error,
+                  minY: 0,
+                  maxY: 10,
+                  leftLabel: '/10',
+                ),
+              if (effectSpots.isNotEmpty)
+                _ChartCard(
+                  title: 'Effect per sessie',
+                  spots: effectSpots,
+                  color: Colors.green,
+                  minY: 0,
+                  maxY: 1,
+                  leftLabel: '',
+                  bottomLabels: const ['Slechter', 'Beter'],
+                ),
+            ],
           ),
-        if (ratingSpots.isNotEmpty)
-          _ChartCard(
-            title: 'Beoordeling per sessie',
-            spots: ratingSpots,
-            color: colors.primary,
-            minY: 0,
-            maxY: 10,
-            leftLabel: '/10',
-          ),
-        if (painSpots.isNotEmpty)
-          _ChartCard(
-            title: 'Pijn per sessie',
-            spots: painSpots,
-            color: colors.error,
-            minY: 0,
-            maxY: 10,
-            leftLabel: '/10',
-          ),
-        if (effectSpots.isNotEmpty)
-          _ChartCard(
-            title: 'Effect per sessie',
-            spots: effectSpots,
-            color: Colors.green,
-            minY: 0,
-            maxY: 1,
-            leftLabel: '',
-            bottomLabels: const ['Slechter', 'Beter'],
-          ),
+        ),
       ],
     );
   }

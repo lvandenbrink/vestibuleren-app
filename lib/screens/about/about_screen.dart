@@ -14,9 +14,9 @@ class AboutScreen extends StatelessWidget {
         title: const Text('Over'),
         backgroundColor: colors.primaryContainer,
       ),
-      body: AdaptiveContainer(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(32),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(32),
+        child: AdaptiveContainer(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [

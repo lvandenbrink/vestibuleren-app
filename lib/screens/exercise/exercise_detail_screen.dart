@@ -179,9 +179,9 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen>
         title: Text(_exercise.title),
         backgroundColor: colors.primaryContainer,
       ),
-      body: AdaptiveContainer(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: AdaptiveContainer(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../core/adaptive_container.dart';
 import 'exercises_tab.dart';
 import 'history_tab.dart';
 import 'stats_tab.dart';
@@ -48,7 +47,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ],
       ),
-      body: AdaptiveContainer(child: _tabs[_tabIndex]),
+      body: _tabs[_tabIndex],
       bottomNavigationBar: NavigationBar(
         selectedIndex: _tabIndex,
         onDestinationSelected: (i) => setState(() => _tabIndex = i),

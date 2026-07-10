@@ -52,9 +52,9 @@ class _FeedbackScreenState extends ConsumerState<FeedbackScreen> {
           ),
         ],
       ),
-      body: AdaptiveContainer(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: AdaptiveContainer(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
