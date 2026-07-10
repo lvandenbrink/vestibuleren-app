@@ -1,13 +1,16 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
+import '../../core/adaptive_container.dart';
 import '../../data/exercise_catalog.dart';
 import '../../models/exercise.dart';
-import '../../providers/metronome_provider.dart';
 import '../../models/exercise_settings.dart';
+import '../../providers/metronome_provider.dart';
 import '../../providers/settings_provider.dart';
 
 class ExerciseDetailScreen extends ConsumerStatefulWidget {
@@ -33,7 +36,8 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    final match = exerciseCatalog.where((e) => e.id == widget.exerciseId).firstOrNull;
+    final match =
+        exerciseCatalog.where((e) => e.id == widget.exerciseId).firstOrNull;
     if (match == null) {
       _exerciseNotFound = true;
       return;
@@ -47,10 +51,17 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen>
     _rest = ex?.restSeconds ?? 30;
     if (ex == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        ref.read(settingsProvider.notifier).updateExerciseSettings(
-          _exercise.id,
-          ExerciseSettings(bpm: _bpm, reps: _reps, sets: _sets, restSeconds: _rest),
-        );
+        ref
+            .read(settingsProvider.notifier)
+            .updateExerciseSettings(
+              _exercise.id,
+              ExerciseSettings(
+                bpm: _bpm,
+                reps: _reps,
+                sets: _sets,
+                restSeconds: _rest,
+              ),
+            );
       });
     }
   }
@@ -102,31 +113,38 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen>
       .updateExerciseRestSeconds(_exercise.id, v);
 
   Future<void> _editSeconds(
-      String label, int current, int min, int max, void Function(int) apply) async {
+    String label,
+    int current,
+    int min,
+    int max,
+    void Function(int) apply,
+  ) async {
     final controller = TextEditingController(text: current.toString());
     final result = await showDialog<int>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(label),
-        content: TextField(
-          controller: controller,
-          keyboardType: TextInputType.number,
-          autofocus: true,
-          decoration: InputDecoration(hintText: '$min – $max seconden'),
-        ),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text('Annuleren')),
-          TextButton(
-            onPressed: () {
-              final v = int.tryParse(controller.text);
-              if (v != null && v >= min && v <= max) Navigator.pop(ctx, v);
-            },
-            child: const Text('OK'),
+      builder:
+          (ctx) => AlertDialog(
+            title: Text(label),
+            content: TextField(
+              controller: controller,
+              keyboardType: TextInputType.number,
+              autofocus: true,
+              decoration: InputDecoration(hintText: '$min – $max seconden'),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Annuleren'),
+              ),
+              TextButton(
+                onPressed: () {
+                  final v = int.tryParse(controller.text);
+                  if (v != null && v >= min && v <= max) Navigator.pop(ctx, v);
+                },
+                child: const Text('OK'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
     if (result != null) apply(result);
   }
@@ -136,7 +154,9 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen>
     if (_exerciseNotFound) {
       return Scaffold(
         appBar: AppBar(),
-        body: const Center(child: Text('Oefening niet gevonden.')),
+        body: const AdaptiveContainer(
+          child: Center(child: Text('Oefening niet gevonden.')),
+        ),
       );
     }
 
@@ -159,315 +179,362 @@ class _ExerciseDetailScreenState extends ConsumerState<ExerciseDetailScreen>
         title: Text(_exercise.title),
         backgroundColor: colors.primaryContainer,
       ),
-      body: SafeArea(
-        top: false,
+      body: AdaptiveContainer(
         child: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _ExerciseContent(contentPath: _exercise.contentPath),
-            const SizedBox(height: 16),
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _ExerciseContent(contentPath: _exercise.contentPath),
+              const SizedBox(height: 16),
 
-            // Settings (foldable)
-            Card(
-              clipBehavior: Clip.antiAlias,
-              child: ExpansionTile(
-                initiallyExpanded: _settingsExpanded,
-                onExpansionChanged: (v) =>
-                    setState(() => _settingsExpanded = v),
-                tilePadding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                childrenPadding:
-                    const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                expandedCrossAxisAlignment: CrossAxisAlignment.start,
-                title: Row(
-                  children: [
-                    Text('Instellingen',
-                        style: text.titleMedium
-                            ?.copyWith(fontWeight: FontWeight.bold)),
-                    if (!isIdle) ...[
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: colors.secondaryContainer,
-                          borderRadius: BorderRadius.circular(20),
+              // Settings (foldable)
+              Card(
+                clipBehavior: Clip.antiAlias,
+                child: ExpansionTile(
+                  initiallyExpanded: _settingsExpanded,
+                  onExpansionChanged:
+                      (v) => setState(() => _settingsExpanded = v),
+                  tilePadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 4,
+                  ),
+                  childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                  expandedCrossAxisAlignment: CrossAxisAlignment.start,
+                  title: Row(
+                    children: [
+                      Text(
+                        'Instellingen',
+                        style: text.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
                         ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.lock_outline,
+                      ),
+                      if (!isIdle) ...[
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: colors.secondaryContainer,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.lock_outline,
                                 size: 12,
-                                color: colors.onSecondaryContainer),
-                            const SizedBox(width: 4),
-                            Text('Bezig',
+                                color: colors.onSecondaryContainer,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                'Bezig',
                                 style: TextStyle(
-                                    fontSize: 11,
-                                    color: colors.onSecondaryContainer,
-                                    fontWeight: FontWeight.w500)),
-                          ],
+                                  fontSize: 11,
+                                  color: colors.onSecondaryContainer,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                  subtitle:
+                      _settingsExpanded
+                          ? null
+                          : Padding(
+                            padding: const EdgeInsets.only(bottom: 4),
+                            child: Text(
+                              _settingsSummary,
+                              style: text.bodySmall?.copyWith(
+                                color: colors.onSurfaceVariant,
+                              ),
+                            ),
+                          ),
+                  children: [
+                    // Metronoom
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Metronoom', style: text.bodyMedium),
+                        Text(
+                          _bpm == 0 ? 'Uit' : '$_bpm BPM',
+                          style: text.labelLarge?.copyWith(
+                            color: colors.primary,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        const Text('10', style: TextStyle(fontSize: 12)),
+                        Expanded(
+                          child: Slider(
+                            value: _bpm == 0 ? 10.0 : _bpm.toDouble(),
+                            min: 10,
+                            max: 250,
+                            divisions: 48,
+                            label: '$_bpm BPM',
+                            onChanged:
+                                isIdle
+                                    ? (v) => setState(() => _bpm = v.round())
+                                    : null,
+                            onChangeEnd:
+                                isIdle ? (v) => _saveBpm(v.round()) : null,
+                          ),
+                        ),
+                        const Text('250', style: TextStyle(fontSize: 12)),
+                        const SizedBox(width: 4),
+                        Switch(
+                          value: _bpm > 0,
+                          onChanged:
+                              isIdle
+                                  ? (on) {
+                                    setState(() => _bpm = on ? 60 : 0);
+                                    _saveBpm(on ? 60 : 0);
+                                  }
+                                  : null,
+                        ),
+                      ],
+                    ),
+
+                    const Divider(height: 24),
+
+                    // Reps
+                    _SettingRow(
+                      label: 'Reps',
+                      trailing: _StepperControl(
+                        value: _fmtShort(_reps),
+                        decrementTooltip: 'Minder',
+                        incrementTooltip: 'Meer',
+                        onDecrement:
+                            isIdle && _reps > 5
+                                ? () {
+                                  setState(
+                                    () => _reps = (_reps - 5).clamp(5, 300),
+                                  );
+                                  _saveReps(_reps);
+                                }
+                                : null,
+                        onIncrement:
+                            isIdle && _reps < 300
+                                ? () {
+                                  setState(
+                                    () => _reps = (_reps + 5).clamp(5, 300),
+                                  );
+                                  _saveReps(_reps);
+                                }
+                                : null,
+                        onEdit:
+                            isIdle
+                                ? () => _editSeconds(
+                                  'Reps (5–300s)',
+                                  _reps,
+                                  5,
+                                  300,
+                                  (v) {
+                                    setState(() => _reps = v);
+                                    _saveReps(v);
+                                  },
+                                )
+                                : null,
+                      ),
+                    ),
+
+                    const Divider(height: 24),
+
+                    // Sets
+                    _SettingRow(
+                      label: 'Sets',
+                      trailing: _StepperControl(
+                        value: '$_sets',
+                        decrementTooltip: 'Minder sets',
+                        incrementTooltip: 'Meer sets',
+                        onDecrement:
+                            isIdle && _sets > 1
+                                ? () {
+                                  setState(() => _sets--);
+                                  _saveSets(_sets);
+                                }
+                                : null,
+                        onIncrement:
+                            isIdle && _sets < 20
+                                ? () {
+                                  setState(() => _sets++);
+                                  _saveSets(_sets);
+                                }
+                                : null,
+                      ),
+                    ),
+
+                    const Divider(height: 24),
+
+                    // Rest between sets
+                    _SettingRow(
+                      label: 'Rust tussen sets',
+                      trailing: _StepperControl(
+                        value: _fmtShort(_rest),
+                        decrementTooltip: 'Minder rust',
+                        incrementTooltip: 'Meer rust',
+                        onDecrement:
+                            isIdle && _sets > 1 && _rest > 0
+                                ? () {
+                                  setState(
+                                    () => _rest = (_rest - 5).clamp(0, 120),
+                                  );
+                                  _saveRest(_rest);
+                                }
+                                : null,
+                        onIncrement:
+                            isIdle && _sets > 1 && _rest < 120
+                                ? () {
+                                  setState(
+                                    () => _rest = (_rest + 5).clamp(0, 120),
+                                  );
+                                  _saveRest(_rest);
+                                }
+                                : null,
+                        onEdit:
+                            isIdle && _sets > 1
+                                ? () => _editSeconds(
+                                  'Rust (0–120s)',
+                                  _rest,
+                                  0,
+                                  120,
+                                  (v) {
+                                    setState(() => _rest = v);
+                                    _saveRest(v);
+                                  },
+                                )
+                                : null,
+                      ),
+                    ),
+
+                    const Divider(height: 24),
+
+                    // Total time
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Totale tijd',
+                          style: text.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        Text(
+                          _fmtShort(_totalSeconds),
+                          style: text.titleSmall?.copyWith(
+                            color: colors.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Timer
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 24,
+                  horizontal: 16,
+                ),
+                decoration: BoxDecoration(
+                  color: colors.primaryContainer,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Column(
+                  children: [
+                    if (!isIdle && _sets > 1) ...[
+                      Text(
+                        metronome.isResting
+                            ? 'Rust'
+                            : 'Set ${metronome.currentSet} / ${metronome.totalSets}',
+                        style: text.labelLarge?.copyWith(
+                          color: colors.onPrimaryContainer,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                    ],
+                    Text(
+                      isIdle ? _fmt(_totalSeconds) : metronome.formattedTime,
+                      style: text.displayLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: colors.onPrimaryContainer,
+                        fontFeatures: const [FontFeature.tabularFigures()],
+                      ),
+                    ),
+                    if (!isIdle) ...[
+                      const SizedBox(height: 12),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: LinearProgressIndicator(
+                          value: metronome.progress,
+                          backgroundColor: colors.primary.withAlpha(50),
+                          color: colors.primary,
+                          minHeight: 6,
+                          borderRadius: BorderRadius.circular(3),
+                        ),
+                      ),
+                    ],
+                    if (_bpm > 0) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        '$_bpm BPM',
+                        style: text.labelMedium?.copyWith(
+                          color: colors.onPrimaryContainer,
                         ),
                       ),
                     ],
                   ],
                 ),
-                subtitle: _settingsExpanded
-                    ? null
-                    : Padding(
-                        padding: const EdgeInsets.only(bottom: 4),
-                        child: Text(
-                          _settingsSummary,
-                          style: text.bodySmall
-                              ?.copyWith(color: colors.onSurfaceVariant),
-                        ),
-                      ),
-                children: [
-                  // Metronoom
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('Metronoom', style: text.bodyMedium),
-                      Text(
-                        _bpm == 0 ? 'Uit' : '$_bpm BPM',
-                        style:
-                            text.labelLarge?.copyWith(color: colors.primary),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      const Text('10', style: TextStyle(fontSize: 12)),
-                      Expanded(
-                        child: Slider(
-                          value: _bpm == 0 ? 10.0 : _bpm.toDouble(),
-                          min: 10,
-                          max: 250,
-                          divisions: 48,
-                          label: '$_bpm BPM',
-                          onChanged: isIdle
-                              ? (v) => setState(() => _bpm = v.round())
-                              : null,
-                          onChangeEnd:
-                              isIdle ? (v) => _saveBpm(v.round()) : null,
-                        ),
-                      ),
-                      const Text('250', style: TextStyle(fontSize: 12)),
-                      const SizedBox(width: 4),
-                      Switch(
-                        value: _bpm > 0,
-                        onChanged: isIdle
-                            ? (on) {
-                                setState(() => _bpm = on ? 60 : 0);
-                                _saveBpm(on ? 60 : 0);
-                              }
-                            : null,
-                      ),
-                    ],
-                  ),
-
-                  const Divider(height: 24),
-
-                  // Reps
-                  _SettingRow(
-                    label: 'Reps',
-                    trailing: _StepperControl(
-                      value: _fmtShort(_reps),
-                      decrementTooltip: 'Minder',
-                      incrementTooltip: 'Meer',
-                      onDecrement: isIdle && _reps > 5
-                          ? () {
-                              setState(
-                                  () => _reps = (_reps - 5).clamp(5, 300));
-                              _saveReps(_reps);
-                            }
-                          : null,
-                      onIncrement: isIdle && _reps < 300
-                          ? () {
-                              setState(
-                                  () => _reps = (_reps + 5).clamp(5, 300));
-                              _saveReps(_reps);
-                            }
-                          : null,
-                      onEdit: isIdle
-                          ? () => _editSeconds(
-                                'Reps (5–300s)', _reps, 5, 300,
-                                (v) {
-                                  setState(() => _reps = v);
-                                  _saveReps(v);
-                                },
-                              )
-                          : null,
-                    ),
-                  ),
-
-                  const Divider(height: 24),
-
-                  // Sets
-                  _SettingRow(
-                    label: 'Sets',
-                    trailing: _StepperControl(
-                      value: '$_sets',
-                      decrementTooltip: 'Minder sets',
-                      incrementTooltip: 'Meer sets',
-                      onDecrement: isIdle && _sets > 1
-                          ? () {
-                              setState(() => _sets--);
-                              _saveSets(_sets);
-                            }
-                          : null,
-                      onIncrement: isIdle && _sets < 20
-                          ? () {
-                              setState(() => _sets++);
-                              _saveSets(_sets);
-                            }
-                          : null,
-                    ),
-                  ),
-
-                  const Divider(height: 24),
-
-                  // Rest between sets
-                  _SettingRow(
-                    label: 'Rust tussen sets',
-                    trailing: _StepperControl(
-                      value: _fmtShort(_rest),
-                      decrementTooltip: 'Minder rust',
-                      incrementTooltip: 'Meer rust',
-                      onDecrement: isIdle && _sets > 1 && _rest > 0
-                          ? () {
-                              setState(
-                                  () => _rest = (_rest - 5).clamp(0, 120));
-                              _saveRest(_rest);
-                            }
-                          : null,
-                      onIncrement: isIdle && _sets > 1 && _rest < 120
-                          ? () {
-                              setState(
-                                  () => _rest = (_rest + 5).clamp(0, 120));
-                              _saveRest(_rest);
-                            }
-                          : null,
-                      onEdit: isIdle && _sets > 1
-                          ? () => _editSeconds(
-                                'Rust (0–120s)', _rest, 0, 120,
-                                (v) {
-                                  setState(() => _rest = v);
-                                  _saveRest(v);
-                                },
-                              )
-                          : null,
-                    ),
-                  ),
-
-                  const Divider(height: 24),
-
-                  // Total time
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('Totale tijd',
-                          style: text.bodyMedium
-                              ?.copyWith(fontWeight: FontWeight.w600)),
-                      Text(
-                        _fmtShort(_totalSeconds),
-                        style: text.titleSmall?.copyWith(
-                          color: colors.primary,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
               ),
-            ),
-            const SizedBox(height: 16),
+              const SizedBox(height: 16),
 
-            // Timer
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-              decoration: BoxDecoration(
-                color: colors.primaryContainer,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Column(
-                children: [
-                  if (!isIdle && _sets > 1) ...[
-                    Text(
-                      metronome.isResting
-                          ? 'Rust'
-                          : 'Set ${metronome.currentSet} / ${metronome.totalSets}',
-                      style: text.labelLarge
-                          ?.copyWith(color: colors.onPrimaryContainer),
-                    ),
-                    const SizedBox(height: 4),
-                  ],
-                  Text(
-                    isIdle ? _fmt(_totalSeconds) : metronome.formattedTime,
-                    style: text.displayLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: colors.onPrimaryContainer,
-                      fontFeatures: const [FontFeature.tabularFigures()],
-                    ),
+              if (!metronome.isFinished)
+                ElevatedButton.icon(
+                  onPressed: () {
+                    if (metronome.isRunning) {
+                      ref.read(metronomeProvider.notifier).pause();
+                    } else if (isIdle) {
+                      unawaited(
+                        ref
+                            .read(metronomeProvider.notifier)
+                            .start(_reps, _sets, _rest, _bpm),
+                      );
+                    } else {
+                      ref.read(metronomeProvider.notifier).resume(_bpm);
+                    }
+                  },
+                  icon: Icon(
+                    metronome.isRunning ? Icons.pause : Icons.play_arrow,
                   ),
-                  if (!isIdle) ...[
-                    const SizedBox(height: 12),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: LinearProgressIndicator(
-                        value: metronome.progress,
-                        backgroundColor: colors.primary.withAlpha(50),
-                        color: colors.primary,
-                        minHeight: 6,
-                        borderRadius: BorderRadius.circular(3),
-                      ),
-                    ),
-                  ],
-                  if (_bpm > 0) ...[
-                    const SizedBox(height: 8),
-                    Text(
-                      '$_bpm BPM',
-                      style: text.labelMedium
-                          ?.copyWith(color: colors.onPrimaryContainer),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            if (!metronome.isFinished)
-              ElevatedButton.icon(
-                onPressed: () {
-                  if (metronome.isRunning) {
-                    ref.read(metronomeProvider.notifier).pause();
-                  } else if (isIdle) {
-                    unawaited(ref
-                        .read(metronomeProvider.notifier)
-                        .start(_reps, _sets, _rest, _bpm));
-                  } else {
-                    ref.read(metronomeProvider.notifier).resume(_bpm);
-                  }
-                },
-                icon: Icon(metronome.isRunning ? Icons.pause : Icons.play_arrow),
-                label: Text(metronome.isRunning
-                    ? 'Pauzeren'
-                    : isIdle
+                  label: Text(
+                    metronome.isRunning
+                        ? 'Pauzeren'
+                        : isIdle
                         ? 'Starten'
-                        : 'Hervatten'),
+                        : 'Hervatten',
+                  ),
+                ),
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                onPressed:
+                    () => context.pushReplacement('/feedback/${_exercise.id}'),
+                icon: const Icon(Icons.check_circle_outline),
+                label: const Text('Klaar'),
               ),
-            const SizedBox(height: 12),
-            OutlinedButton.icon(
-              onPressed: () =>
-                  context.pushReplacement('/feedback/${_exercise.id}'),
-              icon: const Icon(Icons.check_circle_outline),
-              label: const Text('Klaar'),
-            ),
-            const SizedBox(height: 24),
-          ],
+              const SizedBox(height: 24),
+            ],
+          ),
         ),
-      ),
       ),
     );
   }
@@ -486,8 +553,7 @@ class _SettingRow extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          child: Text(label,
-              style: Theme.of(context).textTheme.bodyMedium),
+          child: Text(label, style: Theme.of(context).textTheme.bodyMedium),
         ),
         trailing,
       ],
@@ -518,7 +584,8 @@ class _StepperControl extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final text = Theme.of(context).textTheme;
-    final enabled = onDecrement != null || onIncrement != null || onEdit != null;
+    final enabled =
+        onDecrement != null || onIncrement != null || onEdit != null;
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -531,11 +598,14 @@ class _StepperControl extends StatelessWidget {
           Tooltip(
             message: decrementTooltip,
             child: IconButton(
-              icon: Icon(Icons.remove,
-                  size: 18,
-                  color: onDecrement != null
-                      ? colors.onSurface
-                      : colors.onSurface.withAlpha(60)),
+              icon: Icon(
+                Icons.remove,
+                size: 18,
+                color:
+                    onDecrement != null
+                        ? colors.onSurface
+                        : colors.onSurface.withAlpha(60),
+              ),
               onPressed: onDecrement,
               padding: const EdgeInsets.all(10),
               constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
@@ -554,9 +624,10 @@ class _StepperControl extends StatelessWidget {
                     value,
                     style: text.labelLarge?.copyWith(
                       fontWeight: FontWeight.w600,
-                      color: enabled
-                          ? colors.onSurface
-                          : colors.onSurface.withAlpha(60),
+                      color:
+                          enabled
+                              ? colors.onSurface
+                              : colors.onSurface.withAlpha(60),
                     ),
                   ),
                 ),
@@ -566,11 +637,14 @@ class _StepperControl extends StatelessWidget {
           Tooltip(
             message: incrementTooltip,
             child: IconButton(
-              icon: Icon(Icons.add,
-                  size: 18,
-                  color: onIncrement != null
-                      ? colors.onSurface
-                      : colors.onSurface.withAlpha(60)),
+              icon: Icon(
+                Icons.add,
+                size: 18,
+                color:
+                    onIncrement != null
+                        ? colors.onSurface
+                        : colors.onSurface.withAlpha(60),
+              ),
               onPressed: onIncrement,
               padding: const EdgeInsets.all(10),
               constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
@@ -603,13 +677,14 @@ class _ExerciseContent extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             child: MarkdownBody(
               data: _body(snapshot.requireData),
-              imageBuilder: (uri, _, __) => Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Image.asset(
-                  'assets/exercises/${uri.path}',
-                  errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-                ),
-              ),
+              imageBuilder:
+                  (uri, _, __) => Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Image.asset(
+                      'assets/exercises/${uri.path}',
+                      errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                    ),
+                  ),
             ),
           ),
         );

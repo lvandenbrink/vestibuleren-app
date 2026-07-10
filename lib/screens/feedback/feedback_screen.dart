@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../core/adaptive_container.dart';
 import '../../data/exercise_catalog.dart';
 import '../../models/feedback_entry.dart';
 import '../../providers/feedback_provider.dart';
@@ -44,168 +45,194 @@ class _FeedbackScreenState extends ConsumerState<FeedbackScreen> {
         actions: [
           TextButton(
             onPressed: () => context.go('/home'),
-            child: Text('Annuleren',
-                style: TextStyle(color: colors.onPrimaryContainer)),
+            child: Text(
+              'Annuleren',
+              style: TextStyle(color: colors.onPrimaryContainer),
+            ),
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(exercise.title,
-                style: text.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 4),
-            Text('Alle velden zijn optioneel.',
-                style:
-                    text.bodySmall?.copyWith(color: colors.onSurfaceVariant)),
-            const SizedBox(height: 28),
+      body: AdaptiveContainer(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                exercise.title,
+                style: text.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Alle velden zijn optioneel.',
+                style: text.bodySmall?.copyWith(color: colors.onSurfaceVariant),
+              ),
+              const SizedBox(height: 28),
 
-            // Rating
-            Text('Beoordeling oefening', style: text.titleMedium),
-            const SizedBox(height: 4),
-            SliderTheme(
-              data: SliderTheme.of(context).copyWith(
-                activeTrackColor: _rating != null ? colors.primary : grey,
-                inactiveTrackColor: _rating != null
-                    ? colors.primary.withAlpha(40)
-                    : grey.withAlpha(60),
-                thumbColor: _rating != null ? colors.primary : grey,
-              ),
-              child: Slider(
-                value: (_rating ?? 1).toDouble(),
-                min: 1,
-                max: 10,
-                divisions: 9,
-                onChangeStart: (_) {
-                  if (_rating == null) setState(() => _rating = 1);
-                },
-                onChanged: (v) => setState(() => _rating = v.round()),
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Slecht', style: text.labelSmall?.copyWith(color: grey)),
-                if (_rating != null)
-                  Text('$_rating / 10',
-                      style: text.labelMedium?.copyWith(
-                          fontWeight: FontWeight.bold, color: colors.primary)),
-                Text('Uitstekend',
-                    style: text.labelSmall?.copyWith(color: grey)),
-              ],
-            ),
-            const SizedBox(height: 24),
-
-            // Pain level
-            Text('Pijnniveau', style: text.titleMedium),
-            const SizedBox(height: 4),
-            SliderTheme(
-              data: SliderTheme.of(context).copyWith(
-                activeTrackColor: _painLevel != null ? colors.error : grey,
-                inactiveTrackColor: _painLevel != null
-                    ? colors.error.withAlpha(40)
-                    : grey.withAlpha(60),
-                thumbColor: _painLevel != null ? colors.error : grey,
-              ),
-              child: Slider(
-                value: (_painLevel ?? 0).toDouble(),
-                min: 0,
-                max: 10,
-                divisions: 10,
-                onChangeStart: (_) {
-                  if (_painLevel == null) setState(() => _painLevel = 0);
-                },
-                onChanged: (v) => setState(() => _painLevel = v.round()),
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Geen pijn',
-                    style: text.labelSmall?.copyWith(color: grey)),
-                if (_painLevel != null)
-                  Text('$_painLevel / 10',
-                      style: text.labelMedium?.copyWith(
-                          fontWeight: FontWeight.bold, color: colors.error)),
-                Text('Veel pijn',
-                    style: text.labelSmall?.copyWith(color: grey)),
-              ],
-            ),
-            const SizedBox(height: 24),
-
-            // Effect
-            Text('Effect van de oefening', style: text.titleMedium),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: _EffectCard(
-                    label: 'Beter / Geen verschil',
-                    icon: Icons.thumb_up_outlined,
-                    selected: _madeItWorse == false,
-                    activeColor: colors.primary,
-                    onTap: () => setState(() => _madeItWorse = false),
-                  ),
+              // Rating
+              Text('Beoordeling oefening', style: text.titleMedium),
+              const SizedBox(height: 4),
+              SliderTheme(
+                data: SliderTheme.of(context).copyWith(
+                  activeTrackColor: _rating != null ? colors.primary : grey,
+                  inactiveTrackColor:
+                      _rating != null
+                          ? colors.primary.withAlpha(40)
+                          : grey.withAlpha(60),
+                  thumbColor: _rating != null ? colors.primary : grey,
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _EffectCard(
-                    label: 'Slechter',
-                    icon: Icons.thumb_down_outlined,
-                    selected: _madeItWorse == true,
-                    activeColor: colors.error,
-                    onTap: () => setState(() => _madeItWorse = true),
-                  ),
+                child: Slider(
+                  value: (_rating ?? 1).toDouble(),
+                  min: 1,
+                  max: 10,
+                  divisions: 9,
+                  onChangeStart: (_) {
+                    if (_rating == null) setState(() => _rating = 1);
+                  },
+                  onChanged: (v) => setState(() => _rating = v.round()),
                 ),
-              ],
-            ),
-            const SizedBox(height: 24),
-
-            // Notes
-            Text('Notitie', style: text.titleMedium),
-            const SizedBox(height: 8),
-            TextField(
-              controller: _notesController,
-              maxLines: 3,
-              decoration: const InputDecoration(
-                hintText: 'Optionele opmerkingen...',
               ),
-            ),
-            const SizedBox(height: 32),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Slecht', style: text.labelSmall?.copyWith(color: grey)),
+                  if (_rating != null)
+                    Text(
+                      '$_rating / 10',
+                      style: text.labelMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: colors.primary,
+                      ),
+                    ),
+                  Text(
+                    'Uitstekend',
+                    style: text.labelSmall?.copyWith(color: grey),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
 
-            ElevatedButton(
-              onPressed: _saveAndContinue,
-              child: const Text('Opslaan & doorgaan'),
-            ),
-            const SizedBox(height: 12),
-            TextButton(
-              onPressed: _skipAndContinue,
-              child: Text('Overslaan',
-                  style: TextStyle(color: colors.onSurfaceVariant)),
-            ),
-          ],
+              // Pain level
+              Text('Pijnniveau', style: text.titleMedium),
+              const SizedBox(height: 4),
+              SliderTheme(
+                data: SliderTheme.of(context).copyWith(
+                  activeTrackColor: _painLevel != null ? colors.error : grey,
+                  inactiveTrackColor:
+                      _painLevel != null
+                          ? colors.error.withAlpha(40)
+                          : grey.withAlpha(60),
+                  thumbColor: _painLevel != null ? colors.error : grey,
+                ),
+                child: Slider(
+                  value: (_painLevel ?? 0).toDouble(),
+                  min: 0,
+                  max: 10,
+                  divisions: 10,
+                  onChangeStart: (_) {
+                    if (_painLevel == null) setState(() => _painLevel = 0);
+                  },
+                  onChanged: (v) => setState(() => _painLevel = v.round()),
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Geen pijn',
+                    style: text.labelSmall?.copyWith(color: grey),
+                  ),
+                  if (_painLevel != null)
+                    Text(
+                      '$_painLevel / 10',
+                      style: text.labelMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: colors.error,
+                      ),
+                    ),
+                  Text(
+                    'Veel pijn',
+                    style: text.labelSmall?.copyWith(color: grey),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+
+              // Effect
+              Text('Effect van de oefening', style: text.titleMedium),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: _EffectCard(
+                      label: 'Beter / Geen verschil',
+                      icon: Icons.thumb_up_outlined,
+                      selected: _madeItWorse == false,
+                      activeColor: colors.primary,
+                      onTap: () => setState(() => _madeItWorse = false),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _EffectCard(
+                      label: 'Slechter',
+                      icon: Icons.thumb_down_outlined,
+                      selected: _madeItWorse == true,
+                      activeColor: colors.error,
+                      onTap: () => setState(() => _madeItWorse = true),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+
+              // Notes
+              Text('Notitie', style: text.titleMedium),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _notesController,
+                maxLines: 3,
+                decoration: const InputDecoration(
+                  hintText: 'Optionele opmerkingen...',
+                ),
+              ),
+              const SizedBox(height: 32),
+
+              ElevatedButton(
+                onPressed: _saveAndContinue,
+                child: const Text('Opslaan & doorgaan'),
+              ),
+              const SizedBox(height: 12),
+              TextButton(
+                onPressed: _skipAndContinue,
+                child: Text(
+                  'Overslaan',
+                  style: TextStyle(color: colors.onSurfaceVariant),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Future<void> _saveAndContinue() async {
-    final bpm = ref
-        .read(settingsProvider)
-        .exerciseSettings[widget.exerciseId]
-        ?.bpm;
-    await ref.read(feedbackProvider.notifier).addEntry(
+    final bpm =
+        ref.read(settingsProvider).exerciseSettings[widget.exerciseId]?.bpm;
+    await ref
+        .read(feedbackProvider.notifier)
+        .addEntry(
           FeedbackEntry(
             exerciseId: widget.exerciseId,
             completedAt: DateTime.now(),
             rating: _rating,
             painLevel: _painLevel,
             madeItWorse: _madeItWorse,
-            notes: _notesController.text.trim().isEmpty
-                ? null
-                : _notesController.text.trim(),
+            notes:
+                _notesController.text.trim().isEmpty
+                    ? null
+                    : _notesController.text.trim(),
             bpm: bpm,
           ),
         );

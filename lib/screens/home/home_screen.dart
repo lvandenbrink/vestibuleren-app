@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/adaptive_container.dart';
 import 'exercises_tab.dart';
 import 'history_tab.dart';
 import 'stats_tab.dart';
@@ -39,20 +40,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               if (value == 'settings') context.push('/settings');
               if (value == 'about') context.push('/about');
             },
-            itemBuilder: (_) => const [
-              PopupMenuItem(
-                value: 'settings',
-                child: Text('Oefeningen'),
-              ),
-              PopupMenuItem(
-                value: 'about',
-                child: Text('Over'),
-              ),
-            ],
+            itemBuilder:
+                (_) => const [
+                  PopupMenuItem(value: 'settings', child: Text('Oefeningen')),
+                  PopupMenuItem(value: 'about', child: Text('Over')),
+                ],
           ),
         ],
       ),
-      body: _tabs[_tabIndex],
+      body: AdaptiveContainer(child: _tabs[_tabIndex]),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _tabIndex,
         onDestinationSelected: (i) => setState(() => _tabIndex = i),

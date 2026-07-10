@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
+import '../../core/adaptive_container.dart';
 import '../../data/exercise_catalog.dart';
 import '../../providers/settings_provider.dart';
 
@@ -41,9 +43,9 @@ class _OnboardingShellState extends ConsumerState<OnboardingShell> {
   }
 
   Future<void> _finish() async {
-    await ref.read(settingsProvider.notifier).completeOnboarding(
-          selectedIds: _selectedIds.toList(),
-        );
+    await ref
+        .read(settingsProvider.notifier)
+        .completeOnboarding(selectedIds: _selectedIds.toList());
     if (mounted) context.go('/home');
   }
 
@@ -52,7 +54,7 @@ class _OnboardingShellState extends ConsumerState<OnboardingShell> {
     final colors = Theme.of(context).colorScheme;
 
     return Scaffold(
-      body: SafeArea(
+      body: AdaptiveContainer(
         child: Column(
           children: [
             const SizedBox(height: 16),
@@ -66,9 +68,10 @@ class _OnboardingShellState extends ConsumerState<OnboardingShell> {
                   height: 8,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(4),
-                    color: _currentPage == i
-                        ? colors.primary
-                        : colors.primary.withAlpha(80),
+                    color:
+                        _currentPage == i
+                            ? colors.primary
+                            : colors.primary.withAlpha(80),
                   ),
                 );
               }),
@@ -82,13 +85,14 @@ class _OnboardingShellState extends ConsumerState<OnboardingShell> {
                   _WelcomePage(onNext: _next),
                   _ExerciseSelectionPage(
                     selectedIds: _selectedIds,
-                    onToggle: (id) => setState(() {
-                      if (_selectedIds.contains(id)) {
-                        _selectedIds.remove(id);
-                      } else {
-                        _selectedIds.add(id);
-                      }
-                    }),
+                    onToggle:
+                        (id) => setState(() {
+                          if (_selectedIds.contains(id)) {
+                            _selectedIds.remove(id);
+                          } else {
+                            _selectedIds.add(id);
+                          }
+                        }),
                     onFinish: _finish,
                     onBack: _prev,
                   ),
@@ -122,17 +126,19 @@ class _WelcomePage extends StatelessWidget {
               'assets/icon.png',
               width: 100,
               height: 100,
-              errorBuilder: (_, __, ___) => Icon(
-                Icons.self_improvement_rounded,
-                size: 100,
-                color: colors.primary,
-              ),
+              errorBuilder:
+                  (_, __, ___) => Icon(
+                    Icons.self_improvement_rounded,
+                    size: 100,
+                    color: colors.primary,
+                  ),
             ),
           ),
           const SizedBox(height: 32),
-          Text('Welkom bij Vestibuleren',
-              style:
-                  text.headlineMedium?.copyWith(fontWeight: FontWeight.bold)),
+          Text(
+            'Welkom bij Vestibuleren',
+            style: text.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
+          ),
           const SizedBox(height: 16),
           Text(
             'Deze app helpt u thuis uw vestibulair revalidatieprogramma '
@@ -145,10 +151,7 @@ class _WelcomePage extends StatelessWidget {
             textAlign: TextAlign.left,
           ),
           const Spacer(),
-          ElevatedButton(
-            onPressed: onNext,
-            child: const Text('Aan de slag'),
-          ),
+          ElevatedButton(onPressed: onNext, child: const Text('Aan de slag')),
         ],
       ),
     );
@@ -179,13 +182,17 @@ class _ExerciseSelectionPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Kies uw oefeningen',
-                  style: text.headlineSmall
-                      ?.copyWith(fontWeight: FontWeight.bold)),
+              Text(
+                'Kies uw oefeningen',
+                style: text.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               const SizedBox(height: 4),
               Text(
-                  'Selecteer de oefeningen die uw therapeut heeft aanbevolen.',
-                  style: text.bodyMedium),
+                'Selecteer de oefeningen die uw therapeut heeft aanbevolen.',
+                style: text.bodyMedium,
+              ),
             ],
           ),
         ),
@@ -199,8 +206,11 @@ class _ExerciseSelectionPage extends StatelessWidget {
                 value: selectedIds.contains(ex.id),
                 onChanged: (_) => onToggle(ex.id),
                 title: Text(ex.title),
-                subtitle: Text(ex.description,
-                    maxLines: 1, overflow: TextOverflow.ellipsis),
+                subtitle: Text(
+                  ex.description,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               );
             },
           ),
@@ -217,8 +227,9 @@ class _ExerciseSelectionPage extends StatelessWidget {
                     'Selecteer minimaal één oefening om te beginnen.',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                        fontSize: 12,
-                        color: Theme.of(context).colorScheme.error),
+                      fontSize: 12,
+                      color: Theme.of(context).colorScheme.error,
+                    ),
                   ),
                 ),
               Row(
